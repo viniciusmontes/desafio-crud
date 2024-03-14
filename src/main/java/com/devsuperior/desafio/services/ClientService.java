@@ -1,5 +1,7 @@
 package com.devsuperior.desafio.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,9 +33,9 @@ public class ClientService {
 
 	@Transactional(readOnly = true)
 	public ClientDTO findById(Long id) {
-		Client result = repository.findById(id).get();
-		ClientDTO dto = new ClientDTO(result);
-		return dto;
+		Optional<Client> obj = repository.findById(id);
+		Client entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+		return new ClientDTO(entity);
 	}
 
 	@Transactional
@@ -54,21 +56,22 @@ public class ClientService {
 			Client entity = repository.getReferenceById(id);
 			entity.setName(dto.getName());
 			entity = repository.save(entity);
+			entity.setCpf(dto.getCpf());
+			entity.setIncome(dto.getIncome());
+			entity.setBirthDate(dto.getBirthDate());
+			entity.setChildren(dto.getChildren());
 			return new ClientDTO(entity);
-		}
-		catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id not found " + id);
-		}		
+		}
 	}
 
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
-		}
-		catch (EmptyResultDataAccessException e) {
+		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException("Id not found " + id);
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation");
 		}
 	}

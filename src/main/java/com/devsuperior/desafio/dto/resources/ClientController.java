@@ -28,9 +28,7 @@ public class ClientController {
 	private ClientService service;
 
 	@GetMapping
-	public ResponseEntity<Page<ClientDTO>> findAll(
-			@RequestParam(value = "name", defaultValue = "") String name, Pageable pageable) {
-
+	public ResponseEntity<Page<ClientDTO>> findAll(@RequestParam(value = "name", defaultValue = "") String name, Pageable pageable) {
 		Page<ClientDTO> list = service.findAllPaged(pageable);
 		return ResponseEntity.ok().body(list);
 	}
